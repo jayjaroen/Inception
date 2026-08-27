@@ -1,6 +1,7 @@
 This project has been created as part of the 42 curriculum by jjaroens.
 
-Inception
+**Inception**
+
 Description
 
 Inception is a System Administration project aims to broden knowledge of system administration by introducing containerization with Docker. The goal is to build a small-scale, secure infrastructure running multiple services using dedicated Docker containers.
@@ -22,7 +23,7 @@ Key Design Choices
 - PHP-FPM: configured to process dynamic requests for WordPress, decoupled from the web server.
 
 Technical Comparisons
-Virtual Machines vs Docker: Vms visualize entire hardware stacks, running full guest operating systems on top of a hypervisor. This results in heavy resource overhead and slow startup times. Docker uses OS-level visualization, sharing the host OS kernel and isolating processes, making containers lightweight and fast.
+Virtual Machines vs Docker: Virtual Machines visualize entire hardware stacks, running full guest operating systems on top of a hypervisor. This results in heavy resource overhead and slow startup times. Docker uses OS-level visualization, sharing the host OS kernel and isolating processes, making containers lightweight and fast.
 
 Secrets vs Environmental Variables: Environmental variables are stored in plain text in container runtime environments and can be exposed via docker inspect or process listings. Secrets provide encrypted or restricted access to sensitive data (passwrods, certificates), avoiding leakages in logs or version control.
 
