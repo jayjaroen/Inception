@@ -18,6 +18,8 @@ services:
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
+    env_file:
+    - .env
     networks:
     - inception
     
@@ -31,6 +33,8 @@ services:
   mariadb:
     build: ./requirements/mariadb
     container_name: mariadb
+    env_file:
+    - .env
     volumes:
     - mariadb_data:/var/lib/mysql
     restart: always
