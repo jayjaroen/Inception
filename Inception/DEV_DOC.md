@@ -34,7 +34,6 @@ The Inception subject requires the project to be performed inside a VM.
         ├── mariadb/
         ├── nginx/
         ├── wordpress/
-        └── bonus/
 ```
 
 Each mandatory service has its own Dockerfile.
