@@ -37,6 +37,9 @@ services:
     - .env
     volumes:
     - mariadb_data:/var/lib/mysql
+    secrets:
+    - mariadb_root_password
+    - mariadb_user_password
     restart: always
     networks:
     - inception
