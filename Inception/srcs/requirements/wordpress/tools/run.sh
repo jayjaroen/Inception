@@ -2,20 +2,24 @@
 
 set -e
 
+DB_PASSWORD=$(cat /run/secrets/mariadb_user_password)
+WP_ADMIN_PASSWORD=$(cat /run/secrets/wordpress_root_password)
+WP_PASSWORD=$(cat /run/secrets/wordpress_user_password)
+
 echo "Configuring WordPress..., connecting to Maria DB"
 
 # NOTE: No space between -p and the password string!
 # echo "Host: `${DB_HOST}`, USER: `${DB_USER}`, Password ${DB_PASSWORD}"
 
-# while ! mariadb-admin ping -h"${DB_HOST}" -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; do
-#     echo "Waiting for MariaDB..."
-#     sleep 2
-# done
-
-while ! mariadb -h"${DB_HOST}" -u"${DB_USER}" -p"${DB_PASSWORD}" -e "SELECT 1;" 2>&1; do
+while ! mariadb-admin ping -h"${DB_HOST}" -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; do
     echo "Waiting for MariaDB..."
     sleep 2
 done
+
+# while ! mariadb -h"${DB_HOST}" -u"${DB_USER}" -p"${DB_PASSWORD}" -e "SELECT 1;" 2>&1; do
+#     echo "Waiting for MariaDB..."
+#     sleep 2
+# done
 
 echo "WordPress: MariaDB is up and running"
 
