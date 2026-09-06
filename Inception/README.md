@@ -1,10 +1,6 @@
-# README.md
-
 This project has been created as part of the **42 curriculum** by **jjaroens**.
 
-# Inception
-
-## Description
+# Description
 
 **Inception** is a System Administration project that aims to broaden knowledge of system administration by introducing **containerization with Docker**.
 
@@ -16,26 +12,96 @@ The stack consists of:
 - **WordPress**: Application server powered by **PHP-FPM**.
 - **MariaDB**: Relational database storing WordPress data.
 
----
-
-## Project Description
-
 The project utilizes **Docker** to encapsulate each service into its own isolated environment.
-
 Every container is built from a **Dockerfile** based on the **Debian** base image.
-
 The services run within a **custom Docker network**, isolating internal communications so that only Nginx exposes a port (`443`) to the host machine.
 
 ---
-
 ## Key Design Choices
-
-- **Debian-Based Images**: Chosen for their minimal footprint and precise control over installed dependencies.
-- **Separate Services per Container**: Nginx, WordPress, and MariaDB run in independent containers.
-- **PHP-FPM**: Configured to process dynamic requests for WordPress, decoupled from the web server.
+- **One Service per Container**: Nginx, WordPress, and MariaDB run in separate containers to provide isolation, clear responsibilities, and easier maintenance.
+- **Debian-Based Images**: Debian is used as the base image to provide a familiar Linux environment and greater control over installed packages and dependencies.
+- **Custom Docker Network**: A dedicated Docker network allows WordPress and MariaDB to communicate internally using Docker's DNS while keeping internal services isolated from the host.
+- **Nginx as the Only Entry Point**: Only Nginx exposes port `443` to the host. WordPress and MariaDB remain accessible only through the internal Docker network, reducing the external attack surface.
+- **PHP-FPM**: PHP-FPM is used to process WordPress PHP requests separately from Nginx, following the separation of web server and application processing.
+- **Docker Volumes**: Volumes are used to persist WordPress and MariaDB data independently from the container lifecycle.
+- **HTTPS with TLS**: Nginx is configured to use HTTPS with TLSv1.2/TLSv1.3 to encrypt communication between the client and the server.
+- **Secrets for Sensitive Data**: Sensitive credentials such as database passwords are managed separately from regular configuration to reduce the risk of exposing them in the source code.
 
 ---
+# Instructions
 
+## Requirements
+Before running the project, make sure the following software is installed:
+- **Docker**
+- **Docker Compose**
+- **Make**
+
+## Installation
+**1. Clone the repository:**
+```bash
+git clone <repository_url>
+cd inception
+```
+**2. Configure Environment variables & Secrets:** Make sure that .env file is located inside the srcs/ directory. The secrets/ folder is at the root directory containing the .txt file storing credentials.
+
+**3. Build and Run:** From the project root directory:
+```bash
+make
+```
+The following services should be started:
+```bash
+Nginx
+WordPress
+MariaDB
+```
+Check the running containers with:
+```bash
+docker ps
+```
+**4. Local domain configuration:**
+```bash
+cd /etc/hosts
+127.0.0.1 jjaroens.42.fr
+```
+**5. Accessing WordPress:**
+```bash
+https://jjaroens.42.fr
+```
+## Administrative && Useful Commands
+To stop the running containers:
+```bash
+make down
+```
+Rebuilding the project:
+```bash
+make re
+```
+Removing containers and associated artifacts:
+```bash
+make clean
+```
+Removing containers, images, networks, and other generated resources:
+```bash
+make fclean
+```
+Check running containers:
+```bash
+docker ps
+```
+View logs:
+```bash
+docker compose <container_name> logs
+```
+Check Docker Volumes:
+```bash
+docker volume ls
+```
+Open a shell inside a running container:
+```bash
+docker exec -it <container_name> base
+```
+
+---
 # Technical Comparisons
 
 ## Virtual Machines vs Docker
@@ -86,6 +152,14 @@ A **Host Network** shares the host machine's network namespace directly with the
 | Better suited for isolated services | Provides less network isolation |
 
 ---
+# Resources
+## References
+- [Docker Documentation](https://docs.docker.com/)
+- [Nginx Documentation](https://nginx.org/en/docs/) 
+- [PHP-FPM Documentation](https://www.php.net/manual/en/install.fpm.php) 
+- [MariaDB Documentation](https://mariadb.com/docs/) 
+- [WordPress Documentation](https://developer.wordpress.org/) 
+
 ## Use of AI
 
 AI tools were used as a learning and debugging assistant throughout the project:
