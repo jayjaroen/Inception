@@ -1,37 +1,18 @@
-# USER_DOC.md
+# User Documentation
 
 ## 1. Purpose
 
-This document explains how to use and operate the Inception infrastructure after it has been installed.
+This project provides a small web infrastructure running three main services:
 
-The stack provides a WordPress website through NGINX, with PHP-FPM handling PHP execution and MariaDB storing the database.
+- **Nginx** - Web server and HTTPS entry point.
+- **WordPress** - Content Management System (CMS) used to manage the website.
+- **MariaDB** - Database used by WordPress to store website information.
 
-## 2. Services
+The services run in separate Docker containers and communicate through a private Docker network.
 
-### NGINX
+The user only needs to access Nginx. WordPress and MariaDB are internal services and are not directly accessible from the host machine.
 
-NGINX is the public entry point.
-
-- Accepts HTTPS traffic on port 443.
-- Handles TLS.
-- Routes requests to the WordPress/PHP-FPM service.
-- It is the only service that should be directly exposed to the outside.
-
-### WordPress + PHP-FPM
-
-This container runs WordPress and PHP-FPM.
-
-- WordPress provides the website and administration interface.
-- PHP-FPM executes PHP scripts.
-- NGINX and PHP-FPM are separate services.
-
-### MariaDB
-
-MariaDB provides the database used by WordPress.
-
-It should not be directly exposed to the host. WordPress communicates with it through the Docker network.
-
-## 3. Starting the project
+## 2. Starting and Stopping the project
 
 From the project root:
 
@@ -39,79 +20,39 @@ From the project root:
 make
 ```
 
-If the project Makefile provides explicit targets, use the corresponding documented target.
-
-Check the result:
-
+Stopping the project:
 ```bash
-docker compose -f srcs/docker-compose.yml ps
+make down
 ```
 
-## 4. Stopping the project
-
-To stop and remove the containers/network created by Compose:
-
-```bash
-docker compose -f srcs/docker-compose.yml down
-```
-
-Stopping/removing containers does not necessarily remove named volumes. This is important because the volumes contain persistent data.
-
-## 5. Accessing the website
+## 3. Access the website and the administration panel
 
 The required domain is:
-
 ```text
-https://<login>.42.fr
+https://jjaroens.42.fr
 ```
-
-The site must be accessed over HTTPS through port 443.
-
-If the domain does not resolve, verify that `<login>.42.fr` points to the VM's local IP address.
-
-## 6. Accessing WordPress administration
-
 The administration interface is normally:
-
 ```text
-https://<login>.42.fr/wp-admin/
+https://jjaroens.42.fr/wp-admin/
 ```
+ **Security Notice:** When accessing the site for the first time, your browser may display a **Privacy Warning** because the site uses a self-signed SSL certificate. This is expected for this project and does not indicate a configuration error.
+ To continue, click **"Advanced"** and then select **"Proceed to jjaroens.42.fr (unsafe)"**.
 
-Use the administrator account configured for the project.
 
-The administrator username must comply with the project requirement: it must not contain `admin` or `administrator` (case-insensitively).
+## 4. Locating and Managing Credentials
+**Environment Configuration:** Found inside the srcs/.env file. This contains non-sensitive deployment configurations (e.g., database names, domain keys).
+**Sensitive Passwords (Secrets):** Managed inside the secrets/ directory at the root level:
+secrets/db_password.txt - Stores the raw application user database password.
+secrets/db_root_password.txt - Stores the administrative root database password.
+secrets/wp_admin_password.txt - Stores the WordPress admin password.
+secrets/wp_user_password.txt - Stores the WordPress user password.
 
-## 7. Credentials
-
-Credentials must not be stored in Dockerfiles or committed to Git.
-
-Depending on the implementation, credentials may be supplied through:
-
-- `.env` for non-secret configuration;
-- Docker secrets for confidential values;
-- local secret files under `secrets/`.
-
-Typical secret categories include:
-
-- WordPress database password;
-- MariaDB root password;
-- WordPress administrator credentials.
-
-To inspect Docker secrets, if the project uses them:
-
-```bash
-docker secret ls
-```
-
-Do not print or paste secret contents into logs, Git, or public documentation.
-
-## 8. Checking service health
+## 5. Checking the service status
 
 ### Containers
 
 ```bash
-docker compose -f srcs/docker-compose.yml ps
-docker ps
+docker compose ps
 ```
 
 ### Logs
@@ -121,12 +62,6 @@ docker compose -f srcs/docker-compose.yml logs
 docker compose -f srcs/docker-compose.yml logs nginx
 docker compose -f srcs/docker-compose.yml logs wordpress
 docker compose -f srcs/docker-compose.yml logs mariadb
-```
-
-Follow logs live:
-
-```bash
-docker compose -f srcs/docker-compose.yml logs -f
 ```
 
 ### Networks
