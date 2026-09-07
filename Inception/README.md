@@ -90,7 +90,7 @@ docker ps
 ```
 View logs:
 ```bash
-docker compose <container_name> logs
+docker compose logs <container_name>
 ```
 Check Docker Volumes:
 ```bash
