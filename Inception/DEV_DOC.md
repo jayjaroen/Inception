@@ -1,5 +1,5 @@
 # Developer Document
-This document is for developers and evaluators who need to understand, rebuild, inspect and maintain the Inception project.
+This document is for developers who need to understand, rebuild, inspect and maintain the Inception project.
 The project is built inside a Virtual Machine and uses Docker Compose to orchestrate separate NGINX, WordPress/PHP-FPM and MariaDB containers.
 
 # 1. Setting up the environment
@@ -16,169 +16,101 @@ Install or prepare:
 **Environment variables**
 
 Project-specific configuration is stored in the .env file:
-
+```bash
 srcs/.env
+```
 
 Typical variables include:
-
+```bash
 DOMAIN_NAME=jjaroens.42.fr
-
 MYSQL_DATABASE=wordpress
 MYSQL_USER=wordpress
-
 WP_ADMIN_USER=admin
 WP_ADMIN_EMAIL=admin@example.com
-
+```
 **Secret variables**
 Sensitive credentials are stored separately from normal configuration.
-
-For example:
-
+```bash
 srcs/secrets/
 ├── db_password.txt
 ├── db_root_password.txt
 └── wp_admin_password.txt
+```
 
 Sensitive passwords should not be hard-coded into Dockerfiles, the Compose file, or the source code.
 
-```text
-.
-├── Makefile
-├── README.md
-├── USER_DOC.md
-├── DEV_DOC.md
-├── secrets/
-└── srcs/
-    ├── docker-compose.yml
-    ├── .env
-    └── requirements/
-        ├── mariadb/
-        ├── nginx/
-        ├── wordpress/
-```
-
-Each mandatory service has its own Dockerfile.
-
-## 4. Dockerfile responsibilities
-
-### NGINX Dockerfile
-
-The NGINX image:
-
-- start from the Debian base version;
-- install NGINX and required dependencies;
-- install/configure TLS;
-- copy the NGINX configuration;
-- run NGINX as the container's main process.
-
-### WordPress Dockerfile
-
-The WordPress image:
-
-- start from the Debian base version;
-- install PHP and PHP-FPM plus required extensions/tools;
-- install/configure WordPress;
-- run PHP-FPM as the main service process.
-
-NGINX must not be installed in this container.
-
-### MariaDB Dockerfile
-
-The MariaDB image:
-
-- start from the Debian base version;
-- install MariaDB;
-- configure the database;
-- initialise the database/user configuration;
-- use the persistent database volume;
-- run MariaDB as the main process.
-
-NGINX must not be installed in this container.
-
-## 5. Compose configuration
-
-`srcs/docker-compose.yml` should define:
-
-- the three mandatory services;
-- a Docker network;
-- two named volumes;
-- build instructions for each Dockerfile;
-- environment variables;
-- restart policies;
-- the required NGINX port exposure.
-
-The subject requires each Docker image to have the same name as its corresponding service and each service to run in a dedicated container.
-
-## 6. Building
+## 2. Deployment Management
 
 From the project root:
 
 ```bash
 make
 ```
-
 Or directly through Compose:
 
 ```bash
 docker compose -f srcs/docker-compose.yml build
 docker compose -f srcs/docker-compose.yml up -d
 ```
-
-Validate the Compose configuration first:
-
+Tear down services & interconnections:
 ```bash
-docker compose -f srcs/docker-compose.yml config
+make clean
 ```
 
-## 7. Useful development commands
+## 3. Useful development commands
 
 ### Container status
-
 ```bash
 docker ps
 docker ps -a
 docker compose ps
 ```
-
 ### Images
-
 ```bash
 docker images
 docker image ls
 docker image inspect <image>
 docker image history <image>
 ```
-
 ### Logs
-
 ```bash
 docker compose logs
 docker compose logs -f nginx
 docker compose logs -f wordpress
 docker compose logs -f mariadb
 ```
-
 ### Execute a command
-
 ```bash
 docker exec -it <container> sh
-docker exec <container> <command>
 ```
-
-Use the shell available in the chosen base image; a minimal Alpine image may not include Bash.
-
 ### Networks
-
 ```bash
 docker network ls
 docker network inspect <network>
 ```
-
 ### Volumes
-
 ```bash
 docker volume ls
 docker volume inspect <volume>
 ```
+### Diagnosis commands
+Monitor live NGINX errors:
+```bash
+docker exec -it nginx tail -f /var/log/nginx/error.log
+```
+Clear WordPress Database Cache:
+```bash
+docker exec -it wordpress wp transient delete --all --path=/var/www/html --allow-root
+```
+## 4. Data Storage and Persistence
+Data is stored independently of the container lifecycles using Docker volumes mapped to local host directories.
 
+**Host Machine Storage Paths:**
 
+WordPress Files: /home/jjaroens/data/wordpress
+
+MariaDB Database: /home/jjaroens/data/mariadb
+
+**Persistence Logic:**
+
+Running *make clean* removes the containers, but your physical data remains completely safe on the host machine. When you spin the environment back up using *make*, the containers automatically remount these folders to restore your previous state without any data loss. If you want to completely wipe the system and reset the data, run *make fclean*.
