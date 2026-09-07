@@ -1,24 +1,45 @@
-# DEV_DOC.md
-## 1. Purpose
-
+# Developer Document
 This document is for developers and evaluators who need to understand, rebuild, inspect and maintain the Inception project.
-
 The project is built inside a Virtual Machine and uses Docker Compose to orchestrate separate NGINX, WordPress/PHP-FPM and MariaDB containers.
 
-## 2. Prerequisites
+# 1. Setting up the environment
 
+## Prerequisites
 Install or prepare:
-
 - Virtual Machine environment.
 - Linux guest OS suitable for the project.
 - Docker Engine.
 - Docker Compose plugin.
 - Git.
-- Local hostname configuration for `<login>.42.fr`.
 
-The Inception subject requires the project to be performed inside a VM.
+## Environment Configuration
+**Environment variables**
 
-## 3. Repository structure
+Project-specific configuration is stored in the .env file:
+
+srcs/.env
+
+Typical variables include:
+
+DOMAIN_NAME=jjaroens.42.fr
+
+MYSQL_DATABASE=wordpress
+MYSQL_USER=wordpress
+
+WP_ADMIN_USER=admin
+WP_ADMIN_EMAIL=admin@example.com
+
+**Secret variables**
+Sensitive credentials are stored separately from normal configuration.
+
+For example:
+
+srcs/secrets/
+├── db_password.txt
+├── db_root_password.txt
+└── wp_admin_password.txt
+
+Sensitive passwords should not be hard-coded into Dockerfiles, the Compose file, or the source code.
 
 ```text
 .
@@ -44,7 +65,7 @@ Each mandatory service has its own Dockerfile.
 
 The NGINX image:
 
-- start from the pDebian base version;
+- start from the Debian base version;
 - install NGINX and required dependencies;
 - install/configure TLS;
 - copy the NGINX configuration;
