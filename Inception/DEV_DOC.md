@@ -19,15 +19,6 @@ Project-specific configuration is stored in the .env file:
 ```bash
 srcs/.env
 ```
-
-Typical variables include:
-```bash
-DOMAIN_NAME=jjaroens.42.fr
-MYSQL_DATABASE=wordpress
-MYSQL_USER=wordpress
-WP_ADMIN_USER=admin
-WP_ADMIN_EMAIL=admin@example.com
-```
 **Secret variables**
 Sensitive credentials are stored separately from normal configuration.
 ```bash
