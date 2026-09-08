@@ -93,15 +93,6 @@ docker network inspect <network>
 docker volume ls
 docker volume inspect <volume>
 ```
-### Diagnosis commands
-Monitor live NGINX errors:
-```bash
-docker exec -it nginx tail -f /var/log/nginx/error.log
-```
-Clear WordPress Database Cache:
-```bash
-docker exec -it wordpress wp transient delete --all --path=/var/www/html --allow-root
-```
 ## 4. Data Storage and Persistence
 Data is stored independently of the container lifecycles using Docker volumes mapped to local host directories.
 
