@@ -152,6 +152,11 @@ A **Host Network** shares the host machine's network namespace directly with the
 | Better suited for isolated services | Provides less network isolation |
 
 ---
+## Docker Volumes vs Bind Mounts
+**Docker volume** is storage that is managed by Docker.
+**Bind Mount** maps a specific directory or file on the host directory into a container.
+
+---
 # Resources
 ## References
 - [Docker Documentation](https://docs.docker.com/)
